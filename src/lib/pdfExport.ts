@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { User } from '../types';
 
 export const exportStudentData = (user: User) => {
@@ -53,8 +53,7 @@ export const exportStudentData = (user: User) => {
     `${sub.completedHours} / ${sub.targetHours} hrs`
   ]);
   
-  // @ts-ignore - jspdf-autotable extends jsPDF but types might not perfectly align
-  doc.autoTable({
+  autoTable(doc, {
     startY: tableStartY + 10,
     head: [['Subject', 'Progress', 'Hours']],
     body: tableData,
