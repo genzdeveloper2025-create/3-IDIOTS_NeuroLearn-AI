@@ -20,6 +20,7 @@ export interface User {
   lastQuizScore?: number;
   lastQuizSubject?: string;
   studyStreak: number;
+  studyHistory?: { date: string; hours: number }[];
 }
 
 export interface QuizQuestion {

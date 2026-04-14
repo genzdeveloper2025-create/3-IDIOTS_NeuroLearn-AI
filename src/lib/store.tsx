@@ -9,6 +9,22 @@ const defaultSubjects: Subject[] = [
   { id: '4', name: 'Physics', progress: 25, targetHours: 30, completedHours: 7.5, color: '#10b981' },
 ];
 
+const generateMockHistory = () => {
+  const history = [];
+  const today = new Date();
+  for (let i = 30; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    // Random hours between 0 and 4
+    const hours = Math.random() > 0.3 ? Math.random() * 4 : 0;
+    history.push({
+      date: d.toISOString().split('T')[0],
+      hours: Number(hours.toFixed(1))
+    });
+  }
+  return history;
+};
+
 export const demoUsers: User[] = [
   {
     id: 'u1',
@@ -21,6 +37,7 @@ export const demoUsers: User[] = [
     burnoutRisk: 'Low',
     subjects: [...defaultSubjects],
     studyStreak: 14,
+    studyHistory: generateMockHistory(),
   },
   {
     id: 'u2',
@@ -36,6 +53,7 @@ export const demoUsers: User[] = [
       { id: '2', name: 'Advanced Algorithms', progress: 55, targetHours: 80, completedHours: 44, color: '#ef4444' },
     ],
     studyStreak: 3,
+    studyHistory: generateMockHistory(),
   }
 ];
 

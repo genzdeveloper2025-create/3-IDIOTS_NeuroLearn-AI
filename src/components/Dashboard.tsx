@@ -4,7 +4,7 @@ import { exportStudentData } from '../lib/pdfExport';
 import { motion, AnimatePresence } from 'motion/react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
-import { LogOut, Download, Award, Brain, Activity, Flame, Clock, Plus, X } from 'lucide-react';
+import { LogOut, Download, Award, Brain, Activity, Flame, Clock, Plus, X, Calendar } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
@@ -74,7 +74,28 @@ export const Dashboard: React.FC = () => {
         }
         return sub;
       });
-      updateUser({ subjects: updatedSubjects });
+      
+      const today = new Date().toISOString().split('T')[0];
+      const currentHistory = currentUser.studyHistory || [];
+      const todayEntryIndex = currentHistory.findIndex(h => h.date === today);
+      
+      let updatedHistory = [...currentHistory];
+      if (todayEntryIndex >= 0) {
+        updatedHistory[todayEntryIndex] = {
+          ...updatedHistory[todayEntryIndex],
+          hours: Number((updatedHistory[todayEntryIndex].hours + hoursStudied).toFixed(2))
+        };
+      } else {
+        updatedHistory.push({
+          date: today,
+          hours: Number(hoursStudied.toFixed(2))
+        });
+      }
+
+      updateUser({ 
+        subjects: updatedSubjects,
+        studyHistory: updatedHistory
+      });
     }
     setStudyTimer(0);
     setActiveSubject(null);
@@ -371,6 +392,58 @@ export const Dashboard: React.FC = () => {
           </div>
         </motion.div>
       </div>
+      {/* Study Activity Calendar */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-6 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md">
+        <div className="flex items-center gap-2 mb-6">
+          <Calendar className="text-blue-400" />
+          <h2 className="text-lg font-semibold">Study Activity</h2>
+        </div>
+        <div className="overflow-x-auto pb-4">
+          <div className="min-w-[600px]">
+            <div className="flex gap-1">
+              {Array.from({ length: 12 }).map((_, weekIdx) => (
+                <div key={weekIdx} className="flex flex-col gap-1">
+                  {Array.from({ length: 7 }).map((_, dayIdx) => {
+                    const daysAgo = (11 - weekIdx) * 7 + (6 - dayIdx);
+                    const date = new Date();
+                    date.setDate(date.getDate() - daysAgo);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    const historyEntry = currentUser.studyHistory?.find(h => h.date === dateStr);
+                    const hours = historyEntry ? historyEntry.hours : 0;
+                    
+                    let bgClass = 'bg-slate-800';
+                    if (hours > 0 && hours <= 1) bgClass = 'bg-blue-900/60';
+                    else if (hours > 1 && hours <= 2) bgClass = 'bg-blue-700/80';
+                    else if (hours > 2 && hours <= 3) bgClass = 'bg-blue-500';
+                    else if (hours > 3) bgClass = 'bg-blue-400';
+
+                    return (
+                      <div 
+                        key={dayIdx} 
+                        className={`w-4 h-4 rounded-sm ${bgClass} transition-colors hover:ring-2 hover:ring-white/50 cursor-pointer relative group`}
+                      >
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 border border-slate-700">
+                          {date.toLocaleDateString()}: {hours} hrs
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 mt-4 text-xs text-gray-400 justify-end">
+              <span>Less</span>
+              <div className="w-3 h-3 rounded-sm bg-slate-800"></div>
+              <div className="w-3 h-3 rounded-sm bg-blue-900/60"></div>
+              <div className="w-3 h-3 rounded-sm bg-blue-700/80"></div>
+              <div className="w-3 h-3 rounded-sm bg-blue-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-blue-400"></div>
+              <span>More</span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };
