@@ -131,63 +131,73 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 pb-24">
+    <div className="min-h-screen text-cyan-50 p-4 md:p-8 pb-24 relative z-10">
       {/* Header */}
-      <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-slate-900/50 p-6 rounded-2xl backdrop-blur-md border border-slate-800">
+      <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 hud-panel p-6 rounded-none">
+        <div className="hud-bracket-tl"></div>
+        <div className="hud-bracket-tr"></div>
+        <div className="hud-bracket-bl"></div>
+        <div className="hud-bracket-br"></div>
+        
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-2xl font-bold shadow-lg shadow-violet-500/20">
+          <div className="w-16 h-16 rounded-full border-2 border-cyan-400 flex items-center justify-center text-2xl font-bold shadow-[0_0_15px_rgba(0,240,255,0.5)] relative">
+            <div className="absolute inset-0 border-t-2 border-cyan-300 rounded-full animate-spin-slow"></div>
             {currentUser.name.charAt(0)}
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{currentUser.name}</h1>
-            <p className="text-gray-400">Level {currentUser.level} • {currentUser.xp} XP</p>
+            <h1 className="text-2xl font-bold font-mono tracking-widest uppercase neon-text">{currentUser.name}</h1>
+            <p className="text-cyan-500/80 font-mono text-sm">LVL {currentUser.level} // {currentUser.xp} XP</p>
           </div>
         </div>
         <div className="flex gap-3">
           <button 
             onClick={() => exportStudentData(currentUser)}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700"
+            className="flex items-center gap-2 px-4 py-2 bg-cyan-950/50 hover:bg-cyan-900/80 text-cyan-400 rounded-none transition-all border border-cyan-500/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] font-mono text-sm uppercase"
           >
-            <Download size={18} /> Export PDF
+            <Download size={16} /> Export Data
           </button>
           <button 
             onClick={logout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors border border-red-500/20"
+            className="flex items-center gap-2 px-4 py-2 bg-red-950/30 hover:bg-red-900/50 text-red-400 rounded-none transition-all border border-red-500/50 hover:shadow-[0_0_15px_rgba(255,50,50,0.4)] font-mono text-sm uppercase"
           >
-            <LogOut size={18} /> Logout
+            <LogOut size={16} /> Terminate
           </button>
         </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Wellbeing Metrics */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Activity className="text-green-400" /> Wellbeing Status</h2>
-          <div className="space-y-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="hud-panel p-6 rounded-none">
+          <div className="hud-bracket-tl"></div>
+          <div className="hud-bracket-tr"></div>
+          <div className="hud-bracket-bl"></div>
+          <div className="hud-bracket-br"></div>
+          <h2 className="text-sm font-mono tracking-widest text-cyan-500 mb-4 flex items-center gap-2 uppercase"><Activity className="text-cyan-400" size={16} /> Bio-Metrics</h2>
+          <div className="space-y-6">
             <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-400">Health Score</span>
-                <span className={currentUser.healthScore > 70 ? 'text-green-400' : 'text-yellow-400'}>{currentUser.healthScore}%</span>
+              <div className="flex justify-between text-xs font-mono mb-1 uppercase">
+                <span className="text-cyan-600">Health Status</span>
+                <span className={currentUser.healthScore > 70 ? 'text-cyan-400 neon-text' : 'text-orange-400 neon-text-orange'}>{currentUser.healthScore}%</span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-2">
-                <div className={`h-2 rounded-full ${currentUser.healthScore > 70 ? 'bg-green-500' : 'bg-yellow-500'}`} style={{ width: `${currentUser.healthScore}%` }}></div>
+              <div className="w-full bg-slate-900 border border-cyan-900 rounded-none h-1.5 relative overflow-hidden">
+                <div className={`h-full ${currentUser.healthScore > 70 ? 'bg-cyan-500 shadow-[0_0_10px_#06b6d4]' : 'bg-orange-500 shadow-[0_0_10px_#f97316]'}`} style={{ width: `${currentUser.healthScore}%` }}></div>
               </div>
             </div>
             <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-400">Focus Level</span>
-                <span className="text-blue-400">{currentUser.focusLevel}%</span>
+              <div className="flex justify-between text-xs font-mono mb-1 uppercase">
+                <span className="text-cyan-600">Cognitive Focus</span>
+                <span className="text-blue-400 neon-text">{currentUser.focusLevel}%</span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-2">
-                <div className="h-2 rounded-full bg-blue-500" style={{ width: `${currentUser.focusLevel}%` }}></div>
+              <div className="w-full bg-slate-900 border border-blue-900 rounded-none h-1.5 relative overflow-hidden">
+                <div className="h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" style={{ width: `${currentUser.focusLevel}%` }}></div>
               </div>
             </div>
-            <div className="pt-2 flex items-center justify-between border-t border-slate-800">
-              <span className="text-sm text-gray-400">Burnout Risk</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                currentUser.burnoutRisk === 'Low' ? 'bg-green-500/20 text-green-400' : 
-                currentUser.burnoutRisk === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 
-                'bg-red-500/20 text-red-400'
+            <div className="pt-4 flex items-center justify-between border-t border-cyan-900/50">
+              <span className="text-xs font-mono text-cyan-600 uppercase">System Load</span>
+              <span className={`px-2 py-0.5 border text-[10px] font-mono uppercase ${
+                currentUser.burnoutRisk === 'Low' ? 'border-cyan-500 text-cyan-400 shadow-[0_0_5px_rgba(6,182,212,0.5)]' : 
+                currentUser.burnoutRisk === 'Medium' ? 'border-orange-500 text-orange-400 shadow-[0_0_5px_rgba(249,115,22,0.5)]' : 
+                'border-red-500 text-red-400 shadow-[0_0_5px_rgba(239,68,68,0.5)]'
               }`}>
                 {currentUser.burnoutRisk}
               </span>
@@ -196,66 +206,80 @@ export const Dashboard: React.FC = () => {
         </motion.div>
 
         {/* Gamification & Stats */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md flex flex-col justify-center items-center text-center">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="hud-panel p-6 rounded-none flex flex-col justify-center items-center text-center">
+          <div className="hud-bracket-tl"></div>
+          <div className="hud-bracket-tr"></div>
+          <div className="hud-bracket-bl"></div>
+          <div className="hud-bracket-br"></div>
           <div className="flex gap-8 w-full justify-center">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-orange-500/20 flex items-center justify-center mb-2">
-                <Flame className="text-orange-500" size={32} />
+            <div className="flex flex-col items-center relative">
+              <div className="absolute inset-0 border border-orange-500/30 rounded-full animate-spin-slow"></div>
+              <div className="w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center mb-2 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                <Flame className="text-orange-400" size={28} />
               </div>
-              <span className="text-2xl font-bold">{currentUser.studyStreak}</span>
-              <span className="text-xs text-gray-400 uppercase tracking-wider">Day Streak</span>
+              <span className="text-2xl font-mono font-bold neon-text-orange">{currentUser.studyStreak}</span>
+              <span className="text-[10px] text-orange-500/70 font-mono uppercase tracking-widest">Uplink Streak</span>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-violet-500/20 flex items-center justify-center mb-2">
-                <Award className="text-violet-500" size={32} />
+            <div className="flex flex-col items-center relative">
+              <div className="absolute inset-0 border border-cyan-500/30 rounded-full animate-spin-slow-reverse"></div>
+              <div className="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center mb-2 border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <Award className="text-cyan-400" size={28} />
               </div>
-              <span className="text-2xl font-bold">{currentUser.level}</span>
-              <span className="text-xs text-gray-400 uppercase tracking-wider">Current Level</span>
+              <span className="text-2xl font-mono font-bold neon-text">{currentUser.level}</span>
+              <span className="text-[10px] text-cyan-500/70 font-mono uppercase tracking-widest">Clearance</span>
             </div>
           </div>
           {currentUser.lastQuizScore !== undefined && (
-            <div className="mt-6 w-full p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-              <p className="text-sm text-gray-400">Last Quiz: <span className="text-white font-medium">{currentUser.lastQuizSubject}</span></p>
-              <p className="text-lg font-bold text-green-400">{currentUser.lastQuizScore}% Score</p>
+            <div className="mt-6 w-full p-3 bg-cyan-950/30 border border-cyan-800/50 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+              <p className="text-[10px] font-mono text-cyan-600 uppercase">Last Diagnostic: <span className="text-cyan-400">{currentUser.lastQuizSubject}</span></p>
+              <p className="text-lg font-mono font-bold text-cyan-300 neon-text mt-1">{currentUser.lastQuizScore}% Efficiency</p>
             </div>
           )}
         </motion.div>
 
         {/* Live Study Timer */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md flex flex-col">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Clock className="text-blue-400" /> Live Study Session</h2>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="hud-panel p-6 rounded-none flex flex-col">
+          <div className="hud-bracket-tl"></div>
+          <div className="hud-bracket-tr"></div>
+          <div className="hud-bracket-bl"></div>
+          <div className="hud-bracket-br"></div>
+          <h2 className="text-sm font-mono tracking-widest text-cyan-500 mb-4 flex items-center gap-2 uppercase"><Clock className="text-cyan-400" size={16} /> Active Session</h2>
           
           {!isStudying ? (
             <div className="flex-1 flex flex-col justify-center">
               <select 
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 mb-4 text-white focus:ring-2 focus:ring-violet-500 outline-none"
+                className="w-full bg-slate-900 border border-cyan-800 p-3 mb-4 text-cyan-100 font-mono text-sm focus:ring-1 focus:ring-cyan-500 outline-none appearance-none"
                 value={activeSubject || ''}
                 onChange={(e) => setActiveSubject(e.target.value)}
               >
-                <option value="" disabled>Select subject to study...</option>
+                <option value="" disabled>SELECT MODULE...</option>
                 {currentUser.subjects.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>{s.name.toUpperCase()}</option>
                 ))}
               </select>
               <button 
                 onClick={() => activeSubject && setIsStudying(true)}
                 disabled={!activeSubject}
-                className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:hover:bg-violet-600 text-white rounded-lg font-semibold transition-all"
+                className="w-full py-3 bg-cyan-950/50 hover:bg-cyan-900/80 disabled:opacity-50 text-cyan-400 font-mono text-sm uppercase tracking-widest transition-all border border-cyan-500/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] relative overflow-hidden group"
               >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+
                 Start Timer
               </button>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center">
-              <div className="text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400 mb-2">
+            <div className="flex-1 flex flex-col items-center justify-center relative">
+              <div className="absolute inset-0 border-[4px] border-cyan-500/20 rounded-full animate-spin-slow border-t-cyan-400 w-32 h-32 mx-auto top-1/2 -translate-y-1/2"></div>
+              <div className="text-4xl font-mono font-bold neon-text text-cyan-300 mb-2 relative z-10">
                 {formatTime(studyTimer)}
               </div>
-              <p className="text-gray-400 mb-6">Studying: {currentUser.subjects.find(s => s.id === activeSubject)?.name}</p>
+              <p className="text-cyan-500/80 font-mono text-xs uppercase tracking-widest mb-6 relative z-10">MODULE: {currentUser.subjects.find(s => s.id === activeSubject)?.name}</p>
               <button 
                 onClick={handleStopStudy}
-                className="w-full py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg font-semibold transition-all"
+                className="w-full py-3 bg-red-950/30 hover:bg-red-900/50 text-red-400 border border-red-500/50 transition-all font-mono text-sm uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,50,50,0.4)] relative z-10"
               >
-                Stop & Save
+                Terminate & Save
               </button>
             </div>
           )}
@@ -264,14 +288,18 @@ export const Dashboard: React.FC = () => {
 
       {/* Charts & Subjects */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="lg:col-span-2 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold">Subject Progress Overview</h2>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="lg:col-span-2 hud-panel p-6 rounded-none">
+          <div className="hud-bracket-tl"></div>
+          <div className="hud-bracket-tr"></div>
+          <div className="hud-bracket-bl"></div>
+          <div className="hud-bracket-br"></div>
+          <div className="flex justify-between items-center mb-6 border-b border-cyan-900/50 pb-4">
+            <h2 className="text-sm font-mono tracking-widest text-cyan-500 uppercase">Module Progress Overview</h2>
             <button 
               onClick={() => setIsAddingSubject(true)}
-              className="flex items-center gap-1 px-3 py-1.5 bg-violet-600/20 hover:bg-violet-600/40 text-violet-400 rounded-lg transition-colors text-sm font-medium border border-violet-500/30"
+              className="flex items-center gap-1 px-3 py-1.5 bg-cyan-950/50 hover:bg-cyan-900/80 text-cyan-400 transition-all text-xs font-mono uppercase border border-cyan-500/50 hover:shadow-[0_0_10px_rgba(0,240,255,0.3)]"
             >
-              <Plus size={16} /> Add Subject
+              <Plus size={14} /> Init Module
             </button>
           </div>
 
@@ -282,34 +310,35 @@ export const Dashboard: React.FC = () => {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 onSubmit={handleAddSubject}
-                className="mb-8 p-4 bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden"
+                className="mb-8 p-4 bg-slate-950 border border-cyan-800 overflow-hidden relative"
               >
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium text-white">Add New Subject</h3>
-                  <button type="button" onClick={() => setIsAddingSubject(false)} className="text-gray-400 hover:text-white">
+                  <h3 className="font-mono text-cyan-400 text-xs uppercase">Initialize New Module</h3>
+                  <button type="button" onClick={() => setIsAddingSubject(false)} className="text-cyan-600 hover:text-cyan-400">
                     <X size={18} />
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Subject Name</label>
+                    <label className="block text-[10px] font-mono text-cyan-600 mb-1 uppercase">Module Designation</label>
                     <input 
                       type="text" 
                       value={newSubjectName}
                       onChange={(e) => setNewSubjectName(e.target.value)}
-                      placeholder="e.g. Physics, History..."
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-violet-500"
+                      placeholder="e.g. QUANTUM MECHANICS"
+                      className="w-full bg-slate-900 border border-cyan-800 px-3 py-2 text-cyan-100 font-mono text-sm focus:outline-none focus:border-cyan-500 focus:shadow-[0_0_10px_rgba(0,240,255,0.2)]"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Target Hours</label>
+                    <label className="block text-[10px] font-mono text-cyan-600 mb-1 uppercase">Target Duration (HRS)</label>
                     <input 
                       type="number" 
                       min="1"
                       value={newSubjectTargetHours}
                       onChange={(e) => setNewSubjectTargetHours(Number(e.target.value))}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-violet-500"
+                      className="w-full bg-slate-900 border border-cyan-800 px-3 py-2 text-cyan-100 font-mono text-sm focus:outline-none focus:border-cyan-500 focus:shadow-[0_0_10px_rgba(0,240,255,0.2)]"
                       required
                     />
                   </div>
@@ -317,9 +346,9 @@ export const Dashboard: React.FC = () => {
                 <div className="flex justify-end">
                   <button 
                     type="submit"
-                    className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-colors"
+                    className="px-4 py-2 bg-cyan-950/80 hover:bg-cyan-900 text-cyan-400 font-mono text-xs uppercase transition-all border border-cyan-500/50 hover:shadow-[0_0_10px_rgba(0,240,255,0.4)]"
                   >
-                    Save Subject
+                    Execute
                   </button>
                 </div>
               </motion.form>
@@ -331,15 +360,15 @@ export const Dashboard: React.FC = () => {
               <div key={subject.id}>
                 <div className="flex justify-between items-end mb-2">
                   <div>
-                    <h3 className="font-medium">{subject.name}</h3>
-                    <p className="text-xs text-gray-400">{subject.completedHours.toFixed(1)} / {subject.targetHours} hours</p>
+                    <h3 className="font-mono text-cyan-100 uppercase text-sm tracking-wider">{subject.name}</h3>
+                    <p className="text-[10px] font-mono text-cyan-600">{subject.completedHours.toFixed(1)} / {subject.targetHours} HRS</p>
                   </div>
-                  <span className="font-bold" style={{ color: subject.color }}>{subject.progress}%</span>
+                  <span className="font-mono font-bold text-cyan-400 neon-text">{subject.progress}%</span>
                 </div>
-                <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                <div className="w-full bg-slate-900 border border-cyan-900 h-1.5 overflow-hidden">
                   <div 
-                    className="h-full rounded-full transition-all duration-1000 relative"
-                    style={{ width: `${subject.progress}%`, backgroundColor: subject.color }}
+                    className="h-full transition-all duration-1000 relative"
+                    style={{ width: `${subject.progress}%`, backgroundColor: subject.color, boxShadow: `0 0 10px ${subject.color}` }}
                   >
                     <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite]"></div>
                   </div>
@@ -347,45 +376,58 @@ export const Dashboard: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="mt-8 h-64">
+          <div className="mt-8 h-64 border border-cyan-900/50 p-4 bg-slate-950/50 relative">
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
              <Bar 
               data={hoursChartData} 
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                  y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
-                  x: { grid: { display: false } }
+                  y: { beginAtZero: true, grid: { color: 'rgba(6,182,212,0.1)' }, ticks: { color: '#06b6d4', font: { family: 'monospace' } } },
+                  x: { grid: { display: false }, ticks: { color: '#06b6d4', font: { family: 'monospace' } } }
                 },
-                plugins: { legend: { position: 'top' as const, labels: { color: 'white' } } }
+                plugins: { legend: { position: 'top' as const, labels: { color: '#06b6d4', font: { family: 'monospace' } } } }
               }} 
             />
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md flex flex-col h-full">
-          <h2 className="text-lg font-semibold mb-6 shrink-0">Mastery Distribution</h2>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="hud-panel p-6 rounded-none flex flex-col h-full">
+          <div className="hud-bracket-tl"></div>
+          <div className="hud-bracket-tr"></div>
+          <div className="hud-bracket-bl"></div>
+          <div className="hud-bracket-br"></div>
+          <h2 className="text-sm font-mono tracking-widest text-cyan-500 mb-6 shrink-0 uppercase">Data Distribution</h2>
           <div className="flex-1 flex flex-col items-center justify-between min-h-0">
             <div className="relative w-full max-w-[220px] aspect-square shrink-0">
+              <div className="absolute inset-[-20px] border border-cyan-500/20 rounded-full animate-spin-slow border-t-cyan-400"></div>
+              <div className="absolute inset-[-10px] border border-blue-500/20 rounded-full animate-spin-slow-reverse border-b-blue-400"></div>
               <Doughnut 
                 data={subjectChartData} 
                 options={{
-                  cutout: '75%',
+                  cutout: '80%',
                   maintainAspectRatio: false,
                   plugins: {
                     legend: { display: false }
+                  },
+                  elements: {
+                    arc: {
+                      borderWidth: 1,
+                      borderColor: '#020617'
+                    }
                   }
                 }}
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <Brain className="text-slate-700 w-12 h-12" />
+                <Brain className="text-cyan-500/50 w-12 h-12" />
               </div>
             </div>
-            <div className="flex flex-wrap justify-center gap-3 mt-6 w-full overflow-y-auto max-h-[150px] pr-2 custom-scrollbar">
+            <div className="flex flex-wrap justify-center gap-3 mt-8 w-full overflow-y-auto max-h-[150px] pr-2 custom-scrollbar">
               {currentUser.subjects.map(s => (
-                <div key={s.id} className="flex items-center gap-2 text-sm bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700/50">
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }}></span>
-                  <span className="text-gray-300 truncate max-w-[120px]">{s.name}</span>
+                <div key={s.id} className="flex items-center gap-2 text-[10px] font-mono uppercase bg-cyan-950/30 px-3 py-1.5 border border-cyan-800/50">
+                  <span className="w-2 h-2 shrink-0" style={{ backgroundColor: s.color, boxShadow: `0 0 5px ${s.color}` }}></span>
+                  <span className="text-cyan-300 truncate max-w-[120px]">{s.name}</span>
                 </div>
               ))}
             </div>
@@ -393,12 +435,16 @@ export const Dashboard: React.FC = () => {
         </motion.div>
       </div>
       {/* Study Activity Calendar */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-6 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md">
-        <div className="flex items-center gap-2 mb-6">
-          <Calendar className="text-blue-400" />
-          <h2 className="text-lg font-semibold">Study Activity</h2>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-6 hud-panel p-6 rounded-none">
+        <div className="hud-bracket-tl"></div>
+        <div className="hud-bracket-tr"></div>
+        <div className="hud-bracket-bl"></div>
+        <div className="hud-bracket-br"></div>
+        <div className="flex items-center gap-2 mb-6 border-b border-cyan-900/50 pb-4">
+          <Calendar className="text-cyan-400" size={16} />
+          <h2 className="text-sm font-mono tracking-widest text-cyan-500 uppercase">Activity Matrix</h2>
         </div>
-        <div className="overflow-x-auto pb-4">
+        <div className="overflow-x-auto pb-4 custom-scrollbar">
           <div className="min-w-[600px] pt-10">
             <div className="flex gap-1">
               {Array.from({ length: 12 }).map((_, weekIdx) => (
@@ -412,19 +458,19 @@ export const Dashboard: React.FC = () => {
                     const historyEntry = currentUser.studyHistory?.find(h => h.date === dateStr);
                     const hours = historyEntry ? historyEntry.hours : 0;
                     
-                    let bgClass = 'bg-slate-800';
-                    if (hours > 0 && hours <= 1) bgClass = 'bg-blue-900/60';
-                    else if (hours > 1 && hours <= 2) bgClass = 'bg-blue-700/80';
-                    else if (hours > 2 && hours <= 3) bgClass = 'bg-blue-500';
-                    else if (hours > 3) bgClass = 'bg-blue-400';
+                    let bgClass = 'bg-slate-900 border-slate-800';
+                    if (hours > 0 && hours <= 1) bgClass = 'bg-cyan-900/40 border-cyan-900';
+                    else if (hours > 1 && hours <= 2) bgClass = 'bg-cyan-700/60 border-cyan-700';
+                    else if (hours > 2 && hours <= 3) bgClass = 'bg-cyan-500/80 border-cyan-500 shadow-[0_0_5px_rgba(6,182,212,0.5)]';
+                    else if (hours > 3) bgClass = 'bg-cyan-400 border-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.8)]';
 
                     return (
                       <div 
                         key={dayIdx} 
-                        className={`w-4 h-4 rounded-sm ${bgClass} transition-colors hover:ring-2 hover:ring-white/50 cursor-pointer relative group`}
+                        className={`w-4 h-4 border ${bgClass} transition-colors hover:border-white cursor-pointer relative group`}
                       >
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 border border-slate-700">
-                          {date.toLocaleDateString()}: {hours} hrs
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-cyan-950 text-cyan-400 font-mono text-[10px] uppercase opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 border border-cyan-500 shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+                          {date.toLocaleDateString()}: {hours} HRS
                         </div>
                       </div>
                     );
@@ -432,14 +478,14 @@ export const Dashboard: React.FC = () => {
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-2 mt-4 text-xs text-gray-400 justify-end">
-              <span>Less</span>
-              <div className="w-3 h-3 rounded-sm bg-slate-800"></div>
-              <div className="w-3 h-3 rounded-sm bg-blue-900/60"></div>
-              <div className="w-3 h-3 rounded-sm bg-blue-700/80"></div>
-              <div className="w-3 h-3 rounded-sm bg-blue-500"></div>
-              <div className="w-3 h-3 rounded-sm bg-blue-400"></div>
-              <span>More</span>
+            <div className="flex items-center gap-2 mt-4 text-[10px] font-mono text-cyan-600 uppercase justify-end">
+              <span>Min</span>
+              <div className="w-3 h-3 border bg-slate-900 border-slate-800"></div>
+              <div className="w-3 h-3 border bg-cyan-900/40 border-cyan-900"></div>
+              <div className="w-3 h-3 border bg-cyan-700/60 border-cyan-700"></div>
+              <div className="w-3 h-3 border bg-cyan-500/80 border-cyan-500"></div>
+              <div className="w-3 h-3 border bg-cyan-400 border-cyan-300"></div>
+              <span>Max</span>
             </div>
           </div>
         </div>
