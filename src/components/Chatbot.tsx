@@ -24,6 +24,53 @@ export const Chatbot: React.FC = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Load saved quiz state on mount
+  useEffect(() => {
+    const savedStateStr = localStorage.getItem('neurolearn_quiz_state');
+    if (savedStateStr) {
+      try {
+        const savedState = JSON.parse(savedStateStr);
+        if (savedState && savedState.activeQuiz && !savedState.quizCompleted) {
+          setActiveQuiz(savedState.activeQuiz);
+          setCurrentQuestionIndex(savedState.currentQuestionIndex);
+          setQuizScore(savedState.quizScore);
+          setShowExplanation(savedState.showExplanation);
+          setSelectedOption(savedState.selectedOption);
+          setQuizSubject(savedState.quizSubject);
+          setQuizCompleted(savedState.quizCompleted);
+          
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            sender: 'ai',
+            text: `I've restored your ongoing quiz on ${savedState.quizSubject}. Let's continue!`,
+            timestamp: Date.now(),
+            isQuiz: true
+          }]);
+        }
+      } catch (e) {
+        console.error('Failed to parse saved quiz state', e);
+      }
+    }
+  }, []);
+
+  // Save quiz state whenever it changes
+  useEffect(() => {
+    if (activeQuiz && !quizCompleted) {
+      const stateToSave = {
+        activeQuiz,
+        currentQuestionIndex,
+        quizScore,
+        showExplanation,
+        selectedOption,
+        quizSubject,
+        quizCompleted
+      };
+      localStorage.setItem('neurolearn_quiz_state', JSON.stringify(stateToSave));
+    } else if (quizCompleted || !activeQuiz) {
+      localStorage.removeItem('neurolearn_quiz_state');
+    }
+  }, [activeQuiz, currentQuestionIndex, quizScore, showExplanation, selectedOption, quizSubject, quizCompleted]);
+
   useEffect(() => {
     if (isOpen && messages.length === 0 && currentUser) {
       setMessages([
@@ -309,7 +356,7 @@ export const Chatbot: React.FC = () => {
                         <motion.button
                           key={idx}
                           disabled={showExplanation}
-                          onClick={() => handleOptionSelect(idx)}
+                          onClick={(e) => handleOptionSelect(idx, e as any)}
                           className={btnClass}
                           {...animationProps}
                         >
