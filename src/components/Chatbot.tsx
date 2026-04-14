@@ -323,9 +323,15 @@ export const Chatbot: React.FC = () => {
                       animate={{ opacity: 1, height: 'auto' }}
                       className="mt-6"
                     >
-                      <div className={`p-4 rounded-xl mb-4 ${selectedOption === activeQuiz[currentQuestionIndex].correctAnswerIndex ? 'bg-green-900/20 text-green-200 border border-green-500/30' : 'bg-red-900/20 text-red-200 border border-red-500/30'}`}>
-                        <p className="font-bold mb-1">{selectedOption === activeQuiz[currentQuestionIndex].correctAnswerIndex ? '✅ Correct!' : '❌ Incorrect'}</p>
-                        <p className="text-sm">{activeQuiz[currentQuestionIndex].explanation}</p>
+                      <div className={`p-4 rounded-xl mb-4 border ${selectedOption === activeQuiz[currentQuestionIndex].correctAnswerIndex ? 'bg-green-500/20 border-green-500/50 text-green-100' : 'bg-red-500/20 border-red-500/50 text-red-100'}`}>
+                        <div className="flex items-center gap-2 font-bold mb-2 text-lg">
+                          {selectedOption === activeQuiz[currentQuestionIndex].correctAnswerIndex ? (
+                            <><CheckCircle2 className="text-green-400" /> <span className="text-green-400">Correct!</span></>
+                          ) : (
+                            <><XCircle className="text-red-400" /> <span className="text-red-400">Incorrect</span></>
+                          )}
+                        </div>
+                        <p className="text-sm leading-relaxed opacity-90">{activeQuiz[currentQuestionIndex].explanation}</p>
                       </div>
                       <button 
                         onClick={handleNextQuestion}
