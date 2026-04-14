@@ -363,10 +363,10 @@ export const Dashboard: React.FC = () => {
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md flex flex-col">
-          <h2 className="text-lg font-semibold mb-6">Mastery Distribution</h2>
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="relative w-full max-w-[220px] aspect-square">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md flex flex-col h-full">
+          <h2 className="text-lg font-semibold mb-6 shrink-0">Mastery Distribution</h2>
+          <div className="flex-1 flex flex-col items-center justify-between min-h-0">
+            <div className="relative w-full max-w-[220px] aspect-square shrink-0">
               <Doughnut 
                 data={subjectChartData} 
                 options={{
@@ -381,11 +381,11 @@ export const Dashboard: React.FC = () => {
                 <Brain className="text-slate-700 w-12 h-12" />
               </div>
             </div>
-            <div className="flex flex-wrap justify-center gap-4 mt-8 w-full">
+            <div className="flex flex-wrap justify-center gap-3 mt-6 w-full overflow-y-auto max-h-[150px] pr-2 custom-scrollbar">
               {currentUser.subjects.map(s => (
-                <div key={s.id} className="flex items-center gap-2 text-sm">
-                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }}></span>
-                  <span className="text-gray-300">{s.name}</span>
+                <div key={s.id} className="flex items-center gap-2 text-sm bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700/50">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }}></span>
+                  <span className="text-gray-300 truncate max-w-[120px]">{s.name}</span>
                 </div>
               ))}
             </div>
@@ -399,7 +399,7 @@ export const Dashboard: React.FC = () => {
           <h2 className="text-lg font-semibold">Study Activity</h2>
         </div>
         <div className="overflow-x-auto pb-4">
-          <div className="min-w-[600px]">
+          <div className="min-w-[600px] pt-10">
             <div className="flex gap-1">
               {Array.from({ length: 12 }).map((_, weekIdx) => (
                 <div key={weekIdx} className="flex flex-col gap-1">

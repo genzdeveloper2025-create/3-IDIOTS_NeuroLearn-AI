@@ -54,6 +54,23 @@ export const demoUsers: User[] = [
     ],
     studyStreak: 3,
     studyHistory: generateMockHistory(),
+  },
+  {
+    id: 'u3',
+    name: 'Priya Sharma',
+    email: 'priya@neurolearn.ai',
+    xp: 3200,
+    level: 15,
+    healthScore: 75,
+    focusLevel: 80,
+    burnoutRisk: 'Medium',
+    subjects: [
+      { id: '1', name: 'Neuroscience', progress: 70, targetHours: 60, completedHours: 42, color: '#06b6d4' },
+      { id: '2', name: 'Cognitive Psychology', progress: 45, targetHours: 40, completedHours: 18, color: '#8b5cf6' },
+      { id: '3', name: 'Bioinformatics', progress: 20, targetHours: 50, completedHours: 10, color: '#10b981' }
+    ],
+    studyStreak: 7,
+    studyHistory: generateMockHistory(),
   }
 ];
 
