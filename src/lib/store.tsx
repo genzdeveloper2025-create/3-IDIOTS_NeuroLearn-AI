@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { User, Subject } from '../types';
-import { auth, db, googleProvider, signInWithPopup, signOut, onAuthStateChanged, doc, getDoc, setDoc, updateDoc } from '../firebase';
+import { auth, db, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, getDoc, setDoc, updateDoc } from '../firebase';
 
 const defaultSubjects: Subject[] = [
   { id: '1', name: 'Mathematics', progress: 65, targetHours: 40, completedHours: 26, color: '#3b82f6' },
@@ -78,6 +78,8 @@ interface AppContextType {
   currentUser: User | null;
   loginAsDemo: (userId: string) => void;
   login: () => Promise<void>;
+  loginWithEmail: (email: string, pass: string) => Promise<void>;
+  signupWithEmail: (email: string, pass: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (updates: Partial<User>) => Promise<void>;
   addXP: (amount: number) => Promise<void>;
@@ -149,6 +151,44 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const loginWithEmail = async (email: string, pass: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch (error: any) {
+      console.error("Email login failed:", error);
+      alert(error.message || "Failed to sign in with email.");
+      throw error;
+    }
+  };
+
+  const signupWithEmail = async (email: string, pass: string, name: string) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      // The onAuthStateChanged listener will handle creating the user document,
+      // but we need to ensure the name is passed. We'll update the document here if needed,
+      // or let the listener create it with a default name and update it here.
+      const userDocRef = doc(db, 'users', userCredential.user.uid);
+      const newUser: User = {
+        id: userCredential.user.uid,
+        name: name || 'Student',
+        email: email,
+        xp: 0,
+        level: 1,
+        healthScore: 100,
+        focusLevel: 100,
+        burnoutRisk: 'Low',
+        subjects: [...defaultSubjects],
+        studyStreak: 1,
+      };
+      await setDoc(userDocRef, newUser);
+      setCurrentUser(newUser);
+    } catch (error: any) {
+      console.error("Email signup failed:", error);
+      alert(error.message || "Failed to sign up with email.");
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       isDemoRef.current = false;
@@ -185,7 +225,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   return (
-    <AppContext.Provider value={{ currentUser, login, loginAsDemo, logout, updateUser, addXP, isAuthReady }}>
+    <AppContext.Provider value={{ currentUser, login, loginWithEmail, signupWithEmail, loginAsDemo, logout, updateUser, addXP, isAuthReady }}>
       {children}
     </AppContext.Provider>
   );
