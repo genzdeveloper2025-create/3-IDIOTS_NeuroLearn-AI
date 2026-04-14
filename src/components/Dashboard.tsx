@@ -256,20 +256,29 @@ export const Dashboard: React.FC = () => {
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md flex flex-col">
           <h2 className="text-lg font-semibold mb-6">Mastery Distribution</h2>
-          <div className="flex-1 flex items-center justify-center relative">
-            <div className="w-full max-w-[250px]">
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="relative w-full max-w-[220px] aspect-square">
               <Doughnut 
                 data={subjectChartData} 
                 options={{
                   cutout: '75%',
+                  maintainAspectRatio: false,
                   plugins: {
-                    legend: { position: 'bottom', labels: { color: 'white', padding: 20 } }
+                    legend: { display: false }
                   }
                 }}
               />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <Brain className="text-slate-700 w-12 h-12" />
+              </div>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-12">
-              <Brain className="text-slate-700 w-12 h-12" />
+            <div className="flex flex-wrap justify-center gap-4 mt-8 w-full">
+              {currentUser.subjects.map(s => (
+                <div key={s.id} className="flex items-center gap-2 text-sm">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }}></span>
+                  <span className="text-gray-300">{s.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </motion.div>

@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId} (matches Firebase Auth UID)
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required)
+    //   - email: string (required)
+    //   - xp: number (required)
+    //   - level: number (required)
+    //   - healthScore: number (required)
+    //   - focusLevel: number (required)
+    //   - burnoutRisk: string (required, 'Low', 'Medium', 'High')
+    //   - subjects: list (required)
+    //   - lastQuizScore: number (optional)
+    //   - lastQuizSubject: string (optional)
+    //   - studyStreak: number (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidUser(data) {
+      return hasRequiredFields(['id', 'name', 'email', 'xp', 'level', 'healthScore', 'focusLevel', 'burnoutRisk', 'subjects', 'studyStreak']) &&
+             data.id is string && data.id == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             isValidEmail(data.email) &&
+             data.xp is number && data.xp >= 0 &&
+             data.level is number && data.level >= 1 &&
+             data.healthScore is number && data.healthScore >= 0 && data.healthScore <= 100 &&
+             data.focusLevel is number && data.focusLevel >= 0 && data.focusLevel <= 100 &&
+             data.burnoutRisk in ['Low', 'Medium', 'High'] &&
+             data.subjects is list && data.subjects.size() <= 50 &&
+             data.studyStreak is number && data.studyStreak >= 0 &&
+             (!('lastQuizScore' in data) || (data.lastQuizScore is number && data.lastQuizScore >= 0 && data.lastQuizScore <= 100)) &&
+             (!('lastQuizSubject' in data) || (data.lastQuizSubject is string && data.lastQuizSubject.size() <= 100));
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if false; // Users cannot delete their own accounts via client
+    }
+  }
+}

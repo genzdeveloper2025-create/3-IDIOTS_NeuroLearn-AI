@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "Subject": {
+      "title": "Subject",
+      "description": "A subject the user is studying",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "progress": { "type": "number" },
+        "targetHours": { "type": "number" },
+        "completedHours": { "type": "number" },
+        "color": { "type": "string" }
+      },
+      "required": ["id", "name", "progress", "targetHours", "completedHours", "color"]
+    },
+    "User": {
+      "title": "User",
+      "description": "A user of the NeuroLearn AI application",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "xp": { "type": "number" },
+        "level": { "type": "number" },
+        "healthScore": { "type": "number" },
+        "focusLevel": { "type": "number" },
+        "burnoutRisk": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "subjects": { 
+          "type": "array",
+          "items": { "$ref": "#/entities/Subject" }
+        },
+        "lastQuizScore": { "type": "number" },
+        "lastQuizSubject": { "type": "string" },
+        "studyStreak": { "type": "number" }
+      },
+      "required": ["id", "name", "email", "xp", "level", "healthScore", "focusLevel", "burnoutRisk", "subjects", "studyStreak"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles and learning data"
+    }
+  }
+}

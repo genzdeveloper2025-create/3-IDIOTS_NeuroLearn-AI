@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { User, Subject } from '../types';
+import { auth, db, googleProvider, signInWithPopup, signOut, onAuthStateChanged, doc, getDoc, setDoc, updateDoc } from '../firebase';
 
 const defaultSubjects: Subject[] = [
   { id: '1', name: 'Mathematics', progress: 65, targetHours: 40, completedHours: 26, color: '#3b82f6' },
@@ -8,7 +9,7 @@ const defaultSubjects: Subject[] = [
   { id: '4', name: 'Physics', progress: 25, targetHours: 30, completedHours: 7.5, color: '#10b981' },
 ];
 
-const demoUsers: User[] = [
+export const demoUsers: User[] = [
   {
     id: 'u1',
     name: 'Alex Mercer',
@@ -40,71 +41,116 @@ const demoUsers: User[] = [
 
 interface AppContextType {
   currentUser: User | null;
-  login: (email: string) => void;
-  logout: () => void;
-  updateUser: (updates: Partial<User>) => void;
-  addXP: (amount: number) => void;
-  demoUsers: User[];
+  loginAsDemo: (userId: string) => void;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  addXP: (amount: number) => Promise<void>;
+  isAuthReady: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const isDemoRef = useRef(false);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem('neurolearn_user_id');
-    if (storedUserId) {
-      const user = demoUsers.find(u => u.id === storedUserId);
-      if (user) {
-        // Load potentially updated user data from local storage if we wanted full persistence,
-        // but for demo, just loading the base demo user is fine, or we can store the whole user object.
-        const storedUserData = localStorage.getItem(`neurolearn_user_${storedUserId}`);
-        if (storedUserData) {
-          setCurrentUser(JSON.parse(storedUserData));
-        } else {
-          setCurrentUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        isDemoRef.current = false;
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        try {
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setCurrentUser(userDoc.data() as User);
+          } else {
+            // Create new user
+            const newUser: User = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || 'Student',
+              email: firebaseUser.email || '',
+              xp: 0,
+              level: 1,
+              healthScore: 100,
+              focusLevel: 100,
+              burnoutRisk: 'Low',
+              subjects: [...defaultSubjects],
+              studyStreak: 1,
+            };
+            await setDoc(userDocRef, newUser);
+            setCurrentUser(newUser);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      } else {
+        if (!isDemoRef.current) {
+          setCurrentUser(null);
+        }
+      }
+      setIsAuthReady(true);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const loginAsDemo = async (userId: string) => {
+    await signOut(auth); // Ensure firebase is signed out
+    const user = demoUsers.find(u => u.id === userId);
+    if (user) {
+      isDemoRef.current = true;
+      setCurrentUser(user);
+    }
+  };
+
+  const login = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Failed to sign in with Google.");
+    }
+  };
+
+  const logout = async () => {
+    try {
+      isDemoRef.current = false;
+      setCurrentUser(null);
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const updateUser = async (updates: Partial<User>) => {
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...updates };
+      setCurrentUser(updatedUser); // Optimistic update
+      
+      if (!isDemoRef.current) {
+        try {
+          const userDocRef = doc(db, 'users', currentUser.id);
+          await updateDoc(userDocRef, updates);
+        } catch (error) {
+          console.error("Error updating user:", error);
+          // Revert on failure could be handled here
         }
       }
     }
-  }, []);
-
-  const login = (email: string) => {
-    const user = demoUsers.find(u => u.email === email);
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('neurolearn_user_id', user.id);
-      if (!localStorage.getItem(`neurolearn_user_${user.id}`)) {
-        localStorage.setItem(`neurolearn_user_${user.id}`, JSON.stringify(user));
-      }
-    } else {
-      alert('User not found. Try alex@neurolearn.ai or sarah@neurolearn.ai');
-    }
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('neurolearn_user_id');
-  };
-
-  const updateUser = (updates: Partial<User>) => {
-    if (currentUser) {
-      const updatedUser = { ...currentUser, ...updates };
-      setCurrentUser(updatedUser);
-      localStorage.setItem(`neurolearn_user_${updatedUser.id}`, JSON.stringify(updatedUser));
-    }
-  };
-
-  const addXP = (amount: number) => {
+  const addXP = async (amount: number) => {
     if (currentUser) {
       const newXP = currentUser.xp + amount;
-      const newLevel = Math.floor(newXP / 500) + 1; // Simple level formula
-      updateUser({ xp: newXP, level: newLevel });
+      const newLevel = Math.floor(newXP / 500) + 1;
+      await updateUser({ xp: newXP, level: newLevel });
     }
   };
 
   return (
-    <AppContext.Provider value={{ currentUser, login, logout, updateUser, addXP, demoUsers }}>
+    <AppContext.Provider value={{ currentUser, login, loginAsDemo, logout, updateUser, addXP, isAuthReady }}>
       {children}
     </AppContext.Provider>
   );

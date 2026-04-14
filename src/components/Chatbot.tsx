@@ -89,7 +89,7 @@ export const Chatbot: React.FC = () => {
     }]);
   };
 
-  const handleOptionSelect = (index: number) => {
+  const handleOptionSelect = (index: number, event: React.MouseEvent) => {
     if (showExplanation || !activeQuiz) return;
     
     setSelectedOption(index);
@@ -98,11 +98,20 @@ export const Chatbot: React.FC = () => {
     const isCorrect = index === activeQuiz[currentQuestionIndex].correctAnswerIndex;
     if (isCorrect) {
       setQuizScore(prev => prev + 1);
+      
+      const rect = (event.target as HTMLElement).getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+
       confetti({
-        particleCount: 40,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ['#22c55e', '#3b82f6', '#a855f7']
+        particleCount: 30,
+        spread: 50,
+        origin: { x, y },
+        colors: ['#22c55e', '#10b981', '#34d399'],
+        disableForReducedMotion: true,
+        ticks: 100,
+        gravity: 0.8,
+        scalar: 0.8
       });
     }
   };
