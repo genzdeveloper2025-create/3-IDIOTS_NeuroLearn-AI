@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../lib/store';
 import { exportStudentData } from '../lib/pdfExport';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
-import { LogOut, Download, Award, Brain, Activity, Flame, Clock } from 'lucide-react';
+import { LogOut, Download, Award, Brain, Activity, Flame, Clock, Plus, X } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
@@ -13,6 +13,34 @@ export const Dashboard: React.FC = () => {
   const [studyTimer, setStudyTimer] = useState(0);
   const [isStudying, setIsStudying] = useState(false);
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
+  const [isAddingSubject, setIsAddingSubject] = useState(false);
+  const [newSubjectName, setNewSubjectName] = useState('');
+  const [newSubjectTargetHours, setNewSubjectTargetHours] = useState(10);
+
+  const handleAddSubject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSubjectName.trim() || !currentUser) return;
+
+    const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+    const newSubject = {
+      id: `sub_${Date.now()}`,
+      name: newSubjectName.trim(),
+      progress: 0,
+      targetHours: newSubjectTargetHours,
+      completedHours: 0,
+      color: randomColor
+    };
+
+    updateUser({
+      subjects: [...currentUser.subjects, newSubject]
+    });
+
+    setNewSubjectName('');
+    setNewSubjectTargetHours(10);
+    setIsAddingSubject(false);
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -216,7 +244,67 @@ export const Dashboard: React.FC = () => {
       {/* Charts & Subjects */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="lg:col-span-2 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md">
-          <h2 className="text-lg font-semibold mb-6">Subject Progress Overview</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-semibold">Subject Progress Overview</h2>
+            <button 
+              onClick={() => setIsAddingSubject(true)}
+              className="flex items-center gap-1 px-3 py-1.5 bg-violet-600/20 hover:bg-violet-600/40 text-violet-400 rounded-lg transition-colors text-sm font-medium border border-violet-500/30"
+            >
+              <Plus size={16} /> Add Subject
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {isAddingSubject && (
+              <motion.form 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                onSubmit={handleAddSubject}
+                className="mb-8 p-4 bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-medium text-white">Add New Subject</h3>
+                  <button type="button" onClick={() => setIsAddingSubject(false)} className="text-gray-400 hover:text-white">
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">Subject Name</label>
+                    <input 
+                      type="text" 
+                      value={newSubjectName}
+                      onChange={(e) => setNewSubjectName(e.target.value)}
+                      placeholder="e.g. Physics, History..."
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-violet-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">Target Hours</label>
+                    <input 
+                      type="number" 
+                      min="1"
+                      value={newSubjectTargetHours}
+                      onChange={(e) => setNewSubjectTargetHours(Number(e.target.value))}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-violet-500"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Save Subject
+                  </button>
+                </div>
+              </motion.form>
+            )}
+          </AnimatePresence>
+
           <div className="space-y-6">
             {currentUser.subjects.map(subject => (
               <div key={subject.id}>
